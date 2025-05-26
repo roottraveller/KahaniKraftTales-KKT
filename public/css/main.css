@@ -132,6 +132,30 @@ body::before {
     animation: fadeInUp 1s ease-out 0.5s forwards;
 }
 
+/* Demo Badge */
+.demo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(33, 150, 243, 0.2);
+    border: 1px solid rgba(33, 150, 243, 0.4);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    color: rgba(33, 150, 243, 1);
+    margin-top: 10px;
+    animation: fadeInUp 1s ease-out 0.7s forwards;
+    opacity: 0;
+}
+
+.demo-badge i {
+    font-size: 0.9rem;
+    background: none;
+    -webkit-text-fill-color: rgba(33, 150, 243, 1);
+    filter: none;
+    animation: none;
+}
+
 /* Main Content */
 .main-content {
     flex: 1;
@@ -150,6 +174,23 @@ body::before {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.02);
     border-radius: 20px 20px 0 0;
+}
+
+.demo-note {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.demo-note a {
+    color: rgba(33, 150, 243, 0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.demo-note a:hover {
+    color: rgba(33, 150, 243, 1);
+    text-decoration: underline;
 }
 
 /* Enhanced Animations */
