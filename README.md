@@ -33,7 +33,7 @@ A beautiful, modern web application that generates creative stories using AI in 
 - **Story Metadata**: Shows model used, language, and timestamp
 - **Responsive Design**: Works perfectly on all devices
 
-  
+
 ## 🏗️ **Project Structure**
 
 ```
