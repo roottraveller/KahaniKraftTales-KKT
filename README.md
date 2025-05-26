@@ -33,22 +33,7 @@ A beautiful, modern web application that generates creative stories using AI in 
 - **Story Metadata**: Shows model used, language, and timestamp
 - **Responsive Design**: Works perfectly on all devices
 
-### 🎬 **Enhanced Navigation Effects** ✨ NEW!
-- **Vibration Animation**: Story container shakes when navigating between stories
-- **Flicker Effect**: Subtle opacity changes create a dynamic transition
-- **Typewriter Animation**: Story content appears character by character like being typed
-- **Combined Effects**: All animations work together for an immersive experience
-- **Dynamic Speed**: Typewriter speed adjusts based on story length for optimal UX
-- **Smooth Transitions**: Seamless navigation with visual feedback
-
-### 🎨 **Modern UI/UX**
-- **Component-Based Architecture**: Maintainable and scalable code
-- **Horizontal Separators**: Clean visual separation between sections
-- **Smooth Animations**: Engaging user experience with enhanced navigation effects
-- **Loading States**: Beautiful book-flipping animation
-- **Error Handling**: Graceful error messages with retry options
-- **Interactive Demo**: Visit `/demo-effects.html` to see navigation effects in action
-
+  
 ## 🏗️ **Project Structure**
 
 ```
@@ -148,25 +133,7 @@ PORT=3000
 3. Choose your language (English/Hindi/Hinglish)
 4. Click "Generate Story" or press Enter
 
-### Navigation
-- Use **Previous/Next** buttons to browse your story history
-- Use **arrow keys** for quick navigation (when not focused on inputs)
-- Stories are automatically saved locally
-
-### 🎬 Enhanced Navigation Experience
-When you click the **Previous** or **Next** buttons, enjoy the immersive effects:
-- **Vibration**: The story container gently shakes to indicate transition
-- **Flicker**: Subtle opacity changes create dynamic visual feedback
-- **Typewriter**: Story content appears character by character as if being written
-- **Auto-scroll**: Content stays in view during long story typing
-- **Dynamic Speed**: Typing speed adjusts automatically based on story length
-
 **Try the Demo**: Visit `http://localhost:3000/demo-effects.html` to test all effects individually!
-
-### Keyboard Shortcuts
-- **Enter**: Generate story (when input is focused)
-- **Ctrl/Cmd + Enter**: Generate story (from anywhere)
-- **Left/Right Arrow**: Navigate stories (when not in input fields)
 
 ## 🛠️ **Development**
 
@@ -184,57 +151,6 @@ The application follows a modular, component-based architecture:
 1. **New UI Components**: Add CSS files in `public/css/components/`
 2. **New Functionality**: Extend the `StoryApp` class or create new components
 3. **API Endpoints**: Add routes in `server.js`
-
-### Code Style
-- ES6+ JavaScript with classes
-- Modular CSS with component separation
-- Semantic HTML structure
-- Mobile-first responsive design
-
-## 🌟 **Features in Detail**
-
-### Smart Input Validation
-- Generate button automatically disables when input is empty
-- Real-time validation feedback
-- Prevents unnecessary API calls
-
-### API Failure Handling
-- Automatic fallback to demo stories when APIs fail
-- Red notification banner for API failures
-- Seamless user experience even with API issues
-
-### Story Persistence
-- Local storage for story history
-- Automatic cleanup (keeps last 50 stories)
-- Survives browser refreshes
-
-### Responsive Design
-- Mobile-first approach
-- Tablet and desktop optimizations
-- Touch-friendly interface
-
-## 🎨 **Customization**
-
-### Themes
-Modify `public/css/main.css` to change:
-- Color schemes
-- Typography
-- Layout spacing
-- Animation timings
-
-### Languages
-Add new languages by:
-1. Updating language options in HTML
-2. Adding language prompts in `server.js`
-3. Including demo stories for the new language
-
-## 📱 **Browser Support**
-
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
-- Mobile browsers (iOS Safari, Chrome Mobile)
 
 ## 🤝 **Contributing**
 
