@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Effects Demo - KahaniKraftTales</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components/story-display.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .demo-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .demo-controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .demo-btn {
+            background: linear-gradient(135deg, #7877c6 0%, #ff77c6 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(120, 119, 198, 0.4);
+        }
+        .demo-story {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px;
+            margin: 20px 0;
+            color: white;
+        }
+        .demo-title {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #fff 0%, #7877c6 50%, #ff77c6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1 class="demo-title">Navigation Effects Demo</h1>
+        
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="triggerVibration()">
+                <i class="fas fa-mobile-alt"></i> Vibration Effect
+            </button>
+            <button class="demo-btn" onclick="triggerFlicker()">
+                <i class="fas fa-bolt"></i> Flicker Effect
+            </button>
+            <button class="demo-btn" onclick="triggerTypewriter()">
+                <i class="fas fa-keyboard"></i> Typewriter Effect
+            </button>
+            <button class="demo-btn" onclick="triggerCombined()">
+                <i class="fas fa-magic"></i> Combined Effects
+            </button>
+        </div>
+
+        <div class="demo-story" id="demoStory">
+            <h3>Sample Story Content</h3>
+            <div id="storyText">
+                In the mystical realm of Aethermoor, where floating islands danced among the clouds and ancient magic flowed like rivers of starlight, a young apprentice named Lyra discovered a secret that would change everything. The Crystal of Eternal Whispers, hidden for centuries in the depths of the Shadowmere Forest, had begun to sing again. Its haunting melody carried across the land, awakening dormant powers and stirring the hearts of those brave enough to listen. As Lyra ventured deeper into the enchanted woods, she realized that her destiny was intertwined with the crystal's ancient magic, and that the fate of all the floating realms rested in her trembling hands.
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/" class="demo-btn">
+                <i class="fas fa-arrow-left"></i> Back to Main App
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const demoStory = document.getElementById('demoStory');
+        const storyText = document.getElementById('storyText');
+        const originalText = storyText.textContent;
+
+        function triggerVibration() {
+            demoStory.classList.remove('vibrate-effect', 'flicker-effect');
+            setTimeout(() => {
+                demoStory.classList.add('vibrate-effect');
+                setTimeout(() => {
+                    demoStory.classList.remove('vibrate-effect');
+                }, 800);
+            }, 50);
+        }
+
+        function triggerFlicker() {
+            demoStory.classList.remove('vibrate-effect', 'flicker-effect');
+            setTimeout(() => {
+                demoStory.classList.add('flicker-effect');
+                setTimeout(() => {
+                    demoStory.classList.remove('flicker-effect');
+                }, 1000);
+            }, 50);
+        }
+
+        function triggerTypewriter() {
+            storyText.textContent = '';
+            storyText.classList.add('typewriter-active');
+            
+            let index = 0;
+            const speed = 15;
+            
+            function typeNextCharacter() {
+                if (index < originalText.length) {
+                    storyText.textContent += originalText.charAt(index);
+                    index++;
+                    setTimeout(typeNextCharacter, speed);
+                } else {
+                    storyText.classList.remove('typewriter-active');
+                }
+            }
+            
+            typeNextCharacter();
+        }
+
+        function triggerCombined() {
+            // Reset everything
+            demoStory.classList.remove('vibrate-effect', 'flicker-effect');
+            storyText.textContent = '';
+            
+            // Start with vibration and flicker
+            setTimeout(() => {
+                demoStory.classList.add('vibrate-effect', 'flicker-effect');
+                
+                // Start typewriter after brief delay
+                setTimeout(() => {
+                    storyText.classList.add('typewriter-active');
+                    
+                    let index = 0;
+                    const speed = 12;
+                    
+                    function typeNextCharacter() {
+                        if (index < originalText.length) {
+                            storyText.textContent += originalText.charAt(index);
+                            index++;
+                            setTimeout(typeNextCharacter, speed);
+                        } else {
+                            storyText.classList.remove('typewriter-active');
+                            // Clean up effects
+                            setTimeout(() => {
+                                demoStory.classList.remove('vibrate-effect', 'flicker-effect');
+                            }, 300);
+                        }
+                    }
+                    
+                    typeNextCharacter();
+                }, 200);
+            }, 50);
+        }
+    </script>
+</body>
+</html> 
