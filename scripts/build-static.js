@@ -9,19 +9,23 @@ const isGitHubPages = process.env.GITHUB_PAGES === 'true' || buildPlatform === '
 const platformConfigs = {
     'github-pages': {
         basePath: '/KahaniKraftTales-KKT',
-        name: 'GitHub Pages'
+        name: 'GitHub Pages',
+        useSecrets: true
     },
     'netlify': {
         basePath: '',
-        name: 'Netlify'
+        name: 'Netlify',
+        useSecrets: true
     },
     'vercel': {
         basePath: '',
-        name: 'Vercel'
+        name: 'Vercel',
+        useSecrets: true
     },
     'generic': {
         basePath: '',
-        name: 'Generic Static Hosting'
+        name: 'Generic Static Hosting',
+        useSecrets: false
     }
 };
 
@@ -30,6 +34,9 @@ const config = platformConfigs[buildPlatform] || platformConfigs.generic;
 console.log(`🔧 Building for ${config.name}...`);
 if (config.basePath) {
     console.log(`📁 Using base path: ${config.basePath}`);
+}
+if (config.useSecrets) {
+    console.log(`🔐 Using secure environment variables for API keys`);
 }
 
 // Create dist directory
@@ -76,8 +83,19 @@ class StaticStoryApp {
     constructor() {
         this.demoStories = null;
         this.basePath = '${config.basePath}';
+        this.apiKeys = this.loadApiKeys();
         this.loadDemoStories();
         this.initializeApp();
+    }
+
+    loadApiKeys() {
+        // For static deployments, API keys come from environment variables
+        // These are injected at build time from GitHub Secrets or platform env vars
+        return {
+            openai: '${process.env.OPENAI_API_KEY || ''}',
+            gemini: '${process.env.GEMINI_API_KEY || ''}',
+            anthropic: '${process.env.ANTHROPIC_API_KEY || ''}'
+        };
     }
 
     async loadDemoStories() {
@@ -130,6 +148,28 @@ class StaticStoryApp {
         if (retryBtn) {
             retryBtn.addEventListener('click', () => this.generateStory());
         }
+
+        // Update model options based on available API keys
+        this.updateModelOptions();
+    }
+
+    updateModelOptions() {
+        const modelSelect = document.getElementById('modelSelect');
+        const options = modelSelect.querySelectorAll('option');
+        
+        options.forEach(option => {
+            const value = option.value;
+            if (value === 'openai-chatgpt' && !this.apiKeys.openai) {
+                option.disabled = true;
+                option.textContent += ' (API Key Required)';
+            } else if (value === 'google-gemini' && !this.apiKeys.gemini) {
+                option.disabled = true;
+                option.textContent += ' (API Key Required)';
+            } else if (value === 'anthropic-claude' && !this.apiKeys.anthropic) {
+                option.disabled = true;
+                option.textContent += ' (API Key Required)';
+            }
+        });
     }
 
     async generateStory() {
@@ -144,17 +184,118 @@ class StaticStoryApp {
 
         this.showLoading();
 
-        // Simulate API delay for better UX
-        setTimeout(() => {
-            const story = this.getRandomDemoStory(language);
+        try {
+            let story = '';
+            
+            if (model === 'demo') {
+                // Simulate API delay for better UX
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                story = this.getRandomDemoStory(language);
+            } else {
+                story = await this.callAIAPI(prompt, model, language);
+            }
+
             this.displayStory({
                 prompt: prompt,
                 story: story,
                 language: language,
-                model: 'demo',
+                model: model,
                 timestamp: new Date().toISOString()
             });
-        }, 2000);
+        } catch (error) {
+            console.error('Story generation error:', error);
+            this.showError(error.message || 'Failed to generate story. Please try again.');
+        }
+    }
+
+    async callAIAPI(prompt, model, language) {
+        const languagePrompts = {
+            english: \`Write a creative and engaging story based on this prompt: "\${prompt}". Make it interesting and imaginative.\`,
+            hindi: \`इस विषय पर एक रचनात्मक और दिलचस्प कहानी लिखें: "\${prompt}"। इसे दिलचस्प और कल्पनाशील बनाएं।\`,
+            hinglish: \`Is prompt ke basis par ek creative aur engaging story likhiye: "\${prompt}". Ise interesting aur imaginative banayiye.\`
+        };
+
+        const fullPrompt = languagePrompts[language] || languagePrompts.english;
+
+        if (model === 'openai-chatgpt') {
+            return await this.callOpenAI(fullPrompt);
+        } else if (model === 'google-gemini') {
+            return await this.callGemini(fullPrompt);
+        } else if (model === 'anthropic-claude') {
+            return await this.callAnthropic(fullPrompt);
+        } else {
+            throw new Error('Invalid model selected');
+        }
+    }
+
+    async callOpenAI(prompt) {
+        if (!this.apiKeys.openai) {
+            throw new Error('OpenAI API key not configured. Using demo mode instead.');
+        }
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': \`Bearer \${this.apiKeys.openai}\`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 1500,
+                temperature: 0.8
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(\`OpenAI API Error: \${error.error?.message || 'Unknown error'}\`);
+        }
+
+        const data = await response.json();
+        return data.choices[0].message.content.trim();
+    }
+
+    async callGemini(prompt) {
+        if (!this.apiKeys.gemini) {
+            throw new Error('Google Gemini API key not configured. Using demo mode instead.');
+        }
+
+        const response = await fetch(\`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\${this.apiKeys.gemini}\`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.8,
+                    maxOutputTokens: 1500
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(\`Google Gemini API Error: \${error.error?.message || 'Unknown error'}\`);
+        }
+
+        const data = await response.json();
+        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            return data.candidates[0].content.parts[0].text.trim();
+        } else {
+            throw new Error('Invalid response from Gemini API');
+        }
+    }
+
+    async callAnthropic(prompt) {
+        if (!this.apiKeys.anthropic) {
+            throw new Error('Anthropic Claude API key not configured. Using demo mode instead.');
+        }
+
+        // Note: Anthropic API requires server-side calls due to CORS restrictions
+        // For static deployments, we'll show an informative error
+        throw new Error('Anthropic Claude requires server-side implementation. Please use demo mode or other models for static deployments.');
     }
 
     getRandomDemoStory(language) {

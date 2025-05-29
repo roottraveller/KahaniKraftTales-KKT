@@ -39,6 +39,10 @@ jobs:
         env:
           BUILD_PLATFORM: github-pages
           GITHUB_PAGES: true
+          # API Keys from GitHub Secrets (optional - app works in demo mode without them)
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -55,4 +59,5 @@ jobs:
       - name: Display deployment info
         run: |
           echo "🚀 Successfully deployed to GitHub Pages!"
-          echo "🔗 Site URL: ${{ steps.deployment.outputs.page_url }}" 
+          echo "🔗 Site URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "🔐 API Keys: $([ -n "${{ secrets.OPENAI_API_KEY }}" ] && echo "OpenAI ✅" || echo "OpenAI ❌") $([ -n "${{ secrets.GEMINI_API_KEY }}" ] && echo "Gemini ✅" || echo "Gemini ❌") $([ -n "${{ secrets.ANTHROPIC_API_KEY }}" ] && echo "Anthropic ✅" || echo "Anthropic ❌")" 

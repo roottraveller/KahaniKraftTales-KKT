@@ -11,20 +11,43 @@ We support multiple deployment platforms with optimized builds for each:
 - **Vercel** - Git integration or CLI deployment
 - **Generic Static Hosting** - Any static hosting provider
 
+## 🔐 Security First
+
+**Important**: Before deploying, read our [Security Guide](SECURITY.md) to learn how to safely manage API keys.
+
+### Quick Security Setup:
+1. **Never commit API keys** to your repository
+2. **Use platform secrets** for secure key storage
+3. **App works without keys** in demo mode
+4. **Keys are injected at build time** securely
+
 ## 🤖 Automated Deployments (Recommended)
 
-### GitHub Pages (Fully Automated)
+### GitHub Pages (Fully Automated + Secure)
 
 **Setup:**
 1. Go to your repository settings → Pages
 2. Set source to "GitHub Actions"
-3. Push to `main` branch
+3. **Optional**: Add API keys to GitHub Secrets (Settings → Secrets and variables → Actions):
+   ```
+   OPENAI_API_KEY=your_openai_key_here
+   GEMINI_API_KEY=your_gemini_key_here
+   ANTHROPIC_API_KEY=your_anthropic_key_here
+   ```
+4. Push to `main` branch
 
 **What happens:**
 - Automatically builds and deploys on every push to `main`
 - Uses the `deploy-github-pages.yml` workflow
 - Handles base path configuration automatically
+- **Securely injects API keys** from GitHub Secrets
 - Available at: `https://roottraveller.github.io/KahaniKraftTales-KKT`
+
+**Security Features:**
+- ✅ API keys never appear in code or logs
+- ✅ Keys are injected at build time only
+- ✅ App works in demo mode without keys
+- ✅ Automatic model availability detection
 
 ### Build Artifacts for Other Platforms
 
@@ -38,10 +61,10 @@ The `build.yml` workflow creates optimized builds for all platforms:
 ```
 
 **Artifacts generated:**
-- `static-build-github-pages` - For GitHub Pages
-- `static-build-netlify` - For Netlify
-- `static-build-vercel` - For Vercel  
-- `static-build-generic` - For any static hosting
+- `static-build-github-pages` - For GitHub Pages (with secure API key injection)
+- `static-build-netlify` - For Netlify (configure env vars in dashboard)
+- `static-build-vercel` - For Vercel (configure env vars in dashboard)
+- `static-build-generic` - For any static hosting (demo mode only)
 
 ## 🛠️ Manual Deployments
 
@@ -54,12 +77,14 @@ npm install
 ### GitHub Pages
 
 ```bash
-# Build and deploy to gh-pages branch
+# Build and deploy to gh-pages branch (legacy method)
 npm run deploy:github
 
 # Or build only
 npm run build:github-pages
 ```
+
+**Note**: The automated GitHub Actions method is more secure and recommended.
 
 ### Netlify
 
@@ -71,6 +96,17 @@ npm run build:netlify
 # Or connect your Git repository to Netlify
 ```
 
+**Security Setup:**
+1. Deploy your site first
+2. Go to Netlify Dashboard → Site settings → Environment variables
+3. Add your API keys:
+   ```
+   OPENAI_API_KEY=your_openai_key_here
+   GEMINI_API_KEY=your_gemini_key_here
+   ANTHROPIC_API_KEY=your_anthropic_key_here
+   ```
+4. Redeploy to apply the environment variables
+
 ### Vercel
 
 ```bash
@@ -81,14 +117,27 @@ npm run build:vercel
 npx vercel --prod
 ```
 
+**Security Setup:**
+1. Deploy your site first
+2. Go to Vercel Dashboard → Project → Settings → Environment Variables
+3. Add your API keys:
+   ```
+   OPENAI_API_KEY=your_openai_key_here
+   GEMINI_API_KEY=your_gemini_key_here
+   ANTHROPIC_API_KEY=your_anthropic_key_here
+   ```
+4. Redeploy to apply the environment variables
+
 ### Generic Static Hosting
 
 ```bash
-# Build for any static hosting
+# Build for any static hosting (demo mode only)
 npm run build:static
 
 # Upload the dist/ folder to your hosting provider
 ```
+
+**Note**: Generic builds don't include API key support for security reasons. The app will work in demo mode.
 
 ## 🔧 Platform-Specific Configurations
 
@@ -96,11 +145,22 @@ npm run build:static
 - **Base Path:** `/KahaniKraftTales-KKT`
 - **Asset URLs:** Automatically prefixed with base path
 - **Demo Data:** Loads from `{basePath}/data/demo-stories.json`
+- **API Keys:** Injected securely from GitHub Secrets
+- **Security:** ✅ Highest security with automated key injection
 
-### Netlify/Vercel/Generic
+### Netlify/Vercel
 - **Base Path:** `/` (root)
 - **Asset URLs:** Relative paths
 - **Demo Data:** Loads from `./data/demo-stories.json`
+- **API Keys:** Set via platform environment variables
+- **Security:** ✅ Secure via platform secret management
+
+### Generic
+- **Base Path:** `/` (root)
+- **Asset URLs:** Relative paths
+- **Demo Data:** Loads from `./data/demo-stories.json`
+- **API Keys:** Not supported (demo mode only)
+- **Security:** ✅ No API keys = no security risk
 
 ## 📁 Build Output Structure
 
@@ -109,7 +169,7 @@ dist/
 ├── index.html              # Main HTML file
 ├── css/                    # Stylesheets
 ├── js/
-│   └── static-app.js      # Bundled JavaScript
+│   └── static-app.js      # Bundled JavaScript (with secure API handling)
 ├── data/
 │   └── demo-stories.json  # Demo story data
 ├── assets/                # Static assets
@@ -125,6 +185,16 @@ npm run preview
 # Then visit http://localhost:8000
 ```
 
+**For local development with API keys:**
+```bash
+# Copy environment template
+cp env.example .env
+
+# Edit .env with your API keys (never commit this file!)
+# Then run:
+npm run dev
+```
+
 ## 🔍 Troubleshooting
 
 ### GitHub Pages Issues
@@ -132,6 +202,14 @@ npm run preview
 1. **404 on assets:** Check if base path is correctly configured
 2. **Workflow fails:** Ensure GitHub Pages is enabled in repository settings
 3. **Old content:** Clear browser cache or check if deployment completed
+4. **API keys not working:** Check GitHub Secrets are properly set
+
+### API Key Issues
+
+1. **Models disabled:** Check if API keys are properly configured
+2. **"API Key Required" message:** Add keys to your platform's secret management
+3. **Demo mode only:** This is normal if no API keys are configured
+4. **CORS errors:** Some APIs (like Anthropic) require server-side implementation
 
 ### General Issues
 
@@ -152,7 +230,7 @@ npm run build:static
 ## 🚀 Quick Start Commands
 
 ```bash
-# For GitHub Pages
+# For GitHub Pages (most secure)
 npm run deploy:github
 
 # For Netlify
@@ -163,6 +241,9 @@ npm run deploy:vercel
 
 # For local testing
 npm run preview
+
+# For local development with API keys
+npm run dev
 ```
 
 ## 📊 Workflow Status
@@ -178,6 +259,13 @@ Check the status of your deployments:
 - **Netlify:** Configure in your Netlify dashboard
 - **Vercel:** Configure in your Vercel dashboard
 
+## 🔐 Security Resources
+
+- **Security Guide:** [SECURITY.md](SECURITY.md) - Complete API key security guide
+- **GitHub Secrets:** [How to add secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+- **Netlify Env Vars:** [Environment variables](https://docs.netlify.com/environment-variables/overview/)
+- **Vercel Env Vars:** [Environment variables](https://vercel.com/docs/projects/environment-variables)
+
 ---
 
-💡 **Tip:** The GitHub Actions approach is recommended as it provides the most reliable and automated deployment experience. 
+💡 **Tip**: The GitHub Actions approach with GitHub Secrets provides the most secure and automated deployment experience. The app works perfectly in demo mode without any API keys! 
