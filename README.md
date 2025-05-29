@@ -20,16 +20,6 @@ A beautiful web application that generates multilingual stories using various AI
 
 *Note: The live demo works in demo mode. To use real AI models, you'll need to add your own API keys.*
 
-## 🔐 Security First
-
-**Important**: This application implements secure API key management:
-
-- ✅ **No API keys in source code** - Keys are never committed to the repository
-- ✅ **Build-time injection** - Keys are securely injected during deployment
-- ✅ **Platform-specific secrets** - Uses GitHub Secrets, Netlify/Vercel env vars
-- ✅ **Graceful degradation** - App works perfectly without keys (demo mode)
-- ✅ **Model availability detection** - Automatically disables unavailable models
-
 📖 **Read our [Security Guide](SECURITY.md)** for complete API key setup instructions.
 
 ## 📦 Deployment Options
@@ -56,7 +46,7 @@ npm run deploy            # GitHub Pages deployment
 
 **Setup:**
 1. Fork/clone this repository
-2. Go to Settings → Secrets and variables → Actions
+2. Go to GitHub.com Settings → Secrets and variables → Actions
 3. Add your API keys as secrets (optional):
    ```
    OPENAI_API_KEY=your_key_here
@@ -169,19 +159,6 @@ KahaniKraftTales-KKT/
 
 **Try the Demo**: Visit `http://localhost:3000/demo-effects.html` to test all effects individually!
 
-## 🎨 Customization
-
-### Adding Demo Stories
-Edit `data/demo-stories.json`:
-
-```json
-{
-  "english": ["Your English story here..."],
-  "hindi": ["आपकी हिंदी कहानी यहाँ..."],
-  "hinglish": ["Aapki Hinglish story yahan..."]
-}
-```
-
 ## 🛠️ **Development**
 
 ### Component Architecture
@@ -227,15 +204,6 @@ The application follows a modular, component-based architecture:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- OpenAI for ChatGPT API
-- Google for Gemini API
-- Anthropic for Claude API
-- All contributors and users
-
 ---
-
-💡 **Remember**: The application works perfectly in demo mode without any API keys. Only add keys if you want to use real AI models for story generation! 
 
 **Made with ❤️ by rimaurya** | **Powered by AI Magic** ✨ 
