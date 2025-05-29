@@ -1,6 +1,37 @@
 const fs = require('fs');
 const path = require('path');
 
+// Determine build platform and configuration
+const buildPlatform = process.env.BUILD_PLATFORM || 'generic';
+const isGitHubPages = process.env.GITHUB_PAGES === 'true' || buildPlatform === 'github-pages';
+
+// Platform-specific configurations
+const platformConfigs = {
+    'github-pages': {
+        basePath: '/KahaniKraftTales-KKT',
+        name: 'GitHub Pages'
+    },
+    'netlify': {
+        basePath: '',
+        name: 'Netlify'
+    },
+    'vercel': {
+        basePath: '',
+        name: 'Vercel'
+    },
+    'generic': {
+        basePath: '',
+        name: 'Generic Static Hosting'
+    }
+};
+
+const config = platformConfigs[buildPlatform] || platformConfigs.generic;
+
+console.log(`🔧 Building for ${config.name}...`);
+if (config.basePath) {
+    console.log(`📁 Using base path: ${config.basePath}`);
+}
+
 // Create dist directory
 const distDir = path.join(__dirname, '..', 'dist');
 if (!fs.existsSync(distDir)) {
@@ -40,17 +71,19 @@ if (fs.existsSync(dataDir)) {
 
 // Create a static version of the app that doesn't require server
 const staticAppJs = `
-// Static version for GitHub Pages deployment
+// Static version for ${config.name} deployment
 class StaticStoryApp {
     constructor() {
         this.demoStories = null;
+        this.basePath = '${config.basePath}';
         this.loadDemoStories();
         this.initializeApp();
     }
 
     async loadDemoStories() {
         try {
-            const response = await fetch('./data/demo-stories.json');
+            const dataPath = this.basePath ? \`\${this.basePath}/data/demo-stories.json\` : './data/demo-stories.json';
+            const response = await fetch(dataPath);
             this.demoStories = await response.json();
         } catch (error) {
             console.warn('Could not load demo stories, using fallback');
@@ -193,8 +226,42 @@ indexContent = indexContent.replace(
     '<script src="js/static-app.js"></script>'
 );
 
+// Update paths for platforms that need base paths
+if (config.basePath) {
+    // Update CSS links
+    indexContent = indexContent.replace(/href="css\//g, `href="${config.basePath}/css/`);
+    
+    // Update JS links
+    indexContent = indexContent.replace(/src="js\//g, `src="${config.basePath}/js/`);
+    
+    // Update any other asset references
+    indexContent = indexContent.replace(/src="assets\//g, `src="${config.basePath}/assets/`);
+    indexContent = indexContent.replace(/href="assets\//g, `href="${config.basePath}/assets/`);
+}
+
+// Add platform-specific meta tags
+const platformMeta = buildPlatform === 'github-pages' 
+    ? '\n    <meta name="deployment-platform" content="github-pages">'
+    : `\n    <meta name="deployment-platform" content="${buildPlatform}">`;
+
+indexContent = indexContent.replace('</head>', `${platformMeta}\n</head>`);
+
 fs.writeFileSync(indexPath, indexContent);
 
+// Create platform-specific deployment info
+const deploymentInfo = {
+    platform: buildPlatform,
+    basePath: config.basePath,
+    buildTime: new Date().toISOString(),
+    nodeVersion: process.version
+};
+
+fs.writeFileSync(path.join(distDir, 'deployment-info.json'), JSON.stringify(deploymentInfo, null, 2));
+
 console.log('✅ Static build completed successfully!');
-console.log('📁 Output directory: dist/');
-console.log('🚀 Ready for deployment to any static hosting platform'); 
+console.log(`📁 Output directory: dist/`);
+console.log(`🚀 Ready for ${config.name} deployment`);
+if (config.basePath) {
+    console.log(`🔗 Base path configured: ${config.basePath}`);
+}
+console.log(`📋 Deployment info saved to: dist/deployment-info.json`); 

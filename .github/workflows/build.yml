@@ -1,0 +1,56 @@
+name: Build Static Site
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        platform: [generic, github-pages, netlify, vercel]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static site for ${{ matrix.platform }}
+        run: npm run build:static
+        env:
+          BUILD_PLATFORM: ${{ matrix.platform }}
+          GITHUB_PAGES: ${{ matrix.platform == 'github-pages' }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-build-${{ matrix.platform }}
+          path: './dist'
+          retention-days: 30
+
+      - name: Display deployment info
+        run: |
+          echo "✅ Build completed for ${{ matrix.platform }}"
+          echo "📁 Artifacts uploaded as: static-build-${{ matrix.platform }}"
+          if [ "${{ matrix.platform }}" = "netlify" ]; then
+            echo "🚀 Ready for Netlify: Download artifacts and deploy to Netlify"
+          elif [ "${{ matrix.platform }}" = "vercel" ]; then
+            echo "🚀 Ready for Vercel: Download artifacts and deploy to Vercel"
+          elif [ "${{ matrix.platform }}" = "github-pages" ]; then
+            echo "🚀 Ready for GitHub Pages: Use the github-pages-deploy workflow"
+          else
+            echo "🚀 Ready for any static hosting platform"
+          fi 

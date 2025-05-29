@@ -3,15 +3,22 @@
   "version": "1.0.0",
   "description": "A web application that generates multilingual stories using LLMs",
   "main": "server.js",
+  "homepage": "https://roottraveller.github.io/KahaniKraftTales-KKT",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "npm run build:static",
     "build:static": "node scripts/build-static.js",
+    "build:github-pages": "BUILD_PLATFORM=github-pages npm run build:static",
+    "build:netlify": "BUILD_PLATFORM=netlify npm run build:static",
+    "build:vercel": "BUILD_PLATFORM=vercel npm run build:static",
     "predeploy": "npm run build:static",
     "deploy": "gh-pages -d dist",
-    "deploy:netlify": "npm run build:static && echo 'Ready for Netlify deployment from dist/ folder'",
-    "deploy:vercel": "npm run build:static && echo 'Ready for Vercel deployment from dist/ folder'"
+    "deploy:github": "npm run build:github-pages && gh-pages -d dist",
+    "deploy:netlify": "npm run build:netlify && echo '🚀 Ready for Netlify deployment from dist/ folder'",
+    "deploy:vercel": "npm run build:vercel && echo '🚀 Ready for Vercel deployment from dist/ folder'",
+    "preview": "npm run build:static && cd dist && python3 -m http.server 8000",
+    "clean": "rm -rf dist"
   },
   "keywords": [
     "stories",
